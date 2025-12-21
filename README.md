@@ -33,3 +33,10 @@ mysql> show tables;
 
 ## world
 - Installation
+
+## Linter
+- 試しにsqruffを導入してみた。.sqruffファイルを作成してからlintを実行する。
+```
+sqruff lint sql-examle.sql
+sqruff fix sql-examle.sql
+```

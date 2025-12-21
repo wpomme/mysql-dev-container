@@ -1,0 +1,8 @@
+[sqruff]
+dialect = bigquery
+rules = all
+exclude_rules = AM01,AM02
+
+[sqruff:indentation]
+indent_unit = space
+tab_space_size = 4
