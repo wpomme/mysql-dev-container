@@ -96,3 +96,47 @@ SELECT Name FROM city WHERE CountryCode = 'JPN';
 SELECT Name FROM city WHERE CountryCode = (
     SELECT Code FROM country WHERE Name = 'Japan'
 );
+
+-- 複数行のサブクエリ
+-- 1. ラストネームがMONROEである俳優を選択
+-- 2. レーティングがPGである映画を選択
+-- -> Monroeという俳優が出演した映画のレーティングがPGだったケースを取得している
+-- (1), (2) で取得される結果は同じ
+-- (1)
+SELECT fa.actor_id, fa.film_id
+FROM film_actor AS fa
+WHERE fa.actor_id IN
+    (SELECT actor_id FROM actor WHERE last_name = 'MONROE')
+    AND fa.film_id IN
+    (SELECT film_id FROM film WHERE rating = 'PG');
+
+-- (2)
+-- クロス結合を使う
+SELECT actor_id, film_id
+FROM film_actor
+WHERE (actor_id, film_id) IN
+    (SELECT a.actor_id, f.film_id
+     FROM actor AS a
+         CROSS JOIN film AS f
+         WHERE a.last_name = 'MONROE' AND f.rating = 'PG'
+    );
+
+-- 相関サブクエリ
+-- 顧客ごとにレンタルの回数を数えた後、外側のクエリでレンタル回数がちょうど20回の顧客を取得する
+-- クエリの実行回数に注意
+SELECT c.first_name, c.last_name
+FROM customer AS c
+WHERE 20 =
+    (SELECT count(*)
+     FROM rental AS r
+     WHERE r.customer_id = c.customer_id
+    );
+
+-- 相関サブクエリはexists演算子をよく使う
+-- 2005年5月25日よりも前に映画を少なくとも１本レンタルした顧客を取得する
+SELECT c.first_name, c.last_name
+FROM customer AS c
+WHERE EXISTS
+    (SELECT 1 FROM rental AS r
+     WHERE r.customer_id = c.customer_id
+       AND date(r.rental_date) < '2025-05-25');
