@@ -140,3 +140,31 @@ WHERE EXISTS
     (SELECT 1 FROM rental AS r
      WHERE r.customer_id = c.customer_id
        AND date(r.rental_date) < '2025-05-25');
+
+-- 結合
+-- 映画の在庫を調べる
+-- (1) 内部結合
+SELECT f.film_id, f.title, count(*) AS num_copies
+FROM film AS f
+    INNER JOIN inventory AS i
+    ON f.film_id = i.film_id
+GROUP BY f.film_id, f.title;
+
+-- (2) 外部結合
+-- 在庫が0のものも数える
+-- count(i.inventory_id) とすることで、inventory_id列のnullでない値も数える
+SELECT f.film_id, f.title, count(i.inventory_id) AS num_copies
+FROM film AS f
+    LEFT OUTER JOIN inventory AS i
+    ON f.film_id = i.film_id
+GROUP BY f.film_id, f.title;
+-- HAVING num_copies = 0;
+
+-- 条件
+-- 簡単なものから
+SELECT first_name, last_name,
+    CASE
+        WHEN active = 1 THEN 'ACTIVE'
+        ELSE 'INACTIVE'
+    END activity_type
+FROM customer;
